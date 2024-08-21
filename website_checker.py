@@ -100,7 +100,7 @@ def main():
     for i in range(1, len(urls)):
         url = urls[i]
         status = check_website_status(url)
-        worksheet.update_cell(i + 1, 5, status)  # 5번째 컬럼에 결과 기록 (i + 1은 헤더가 있으므로)
+        worksheet.update_cell(i + 1, 5, status)  # 5번째 컬럼에 결과 기록
 
     # 다시 저장된 모든 데이터를 시트에서 가져와서 실패한 것들 URL 바꿔가며 retry 
     data = sheet_processor.get_data_from_sheet(sheet)
