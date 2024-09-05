@@ -105,4 +105,5 @@ def main():
         results.append(updated_row)
     worksheet.update(results, f'A2:F{len(rows)}')
 
-main()
+if __name__ == "__main__":
+    main()

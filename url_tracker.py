@@ -4,6 +4,7 @@ import logging
 from urllib.parse import urlparse, urlunparse
 from dotenv import load_dotenv
 import sheet_processor
+import website_checker
 
 # 로그 설정
 logging.basicConfig(
@@ -29,12 +30,17 @@ def create_url_by_increasing_number(url):
         domain_parts = parsed_url.netloc.split('.')
 
         target_domain = domain_parts[0]
-        if(domain_parts[0] == 'www'):
+        if domain_parts[0] == 'www':
             target_domain = domain_parts[1]
-
         target_domain = target_domain + '1'
+
+        if domain_parts[0] == 'www':
+            domain_parts[1] = target_domain  # www가 있는 경우
+        else:
+            domain_parts[0] = target_domain  # www가 없는 경우
+
         new_domain = '.'.join(domain_parts)
-        
+
         trial_url = urlunparse((
             parsed_url.scheme,
             new_domain,
@@ -51,7 +57,6 @@ def get_failed_result_row(worksheet):
     filtered_rows_with_index = [(i + 1, row) for i, row in enumerate(rows) if row[1] == 'X'] 
     return filtered_rows_with_index
 
-
 # 변경후 url 별도 로깅
 def log_url_change(original_url, new_url):
     if original_url != new_url:
@@ -59,7 +64,8 @@ def log_url_change(original_url, new_url):
         logging.info(log_message)
         print(log_message)  # 콘솔에도 출력
 
-def main():
+# 실패한 웹사이트들 숫자 올려보며 재실행
+def retry_failed_website():
     global worksheet
     load_dotenv()
 
@@ -79,10 +85,29 @@ def main():
         
         if "http" not in original_url:
             continue
-
         for attempt in range(5):  # 최대 5회 시도
             result = 'X'
             trial_url = create_url_by_increasing_number(trial_url)
             print(f"Trying URL: {trial_url}")
+            redirect_flag, result, redirect_url = website_checker.check_website_with_selenium_headless(trial_url)
+            print(result)
+            if result == 'O':
+                final_url = redirect_url if redirect_flag else trial_url
+                updated_row = [
+                    row[0],        # 1번째 열 (연번)
+                    result,        # 2번째 열 (활성화 여부-국내)
+                    row[2],        # 3번째 열 (활성화 여부-국외)
+                    row[3],        # 4번째 열 (이름)
+                    final_url,     # 5번째 열 (redirect_url 또는 trial_url)
+                    original_url   # 6번째 열 (이전의 URL)
+                ]
+                results.append((row_num, updated_row))
+                break
 
-main()
+    print(results)
+
+    for row_num, updated_row in results:
+        cell_range = f'A{row_num}:F{row_num}'  # 해당 row_num에 있는 A~F 열 범위 지정
+        worksheet.update([updated_row], cell_range)
+ 
+retry_failed_website()
