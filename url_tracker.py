@@ -109,5 +109,6 @@ def retry_failed_website():
     for row_num, updated_row in results:
         cell_range = f'A{row_num}:F{row_num}'  # 해당 row_num에 있는 A~F 열 범위 지정
         worksheet.update([updated_row], cell_range)
- 
-retry_failed_website()
+
+if __name__ == "__main__":
+    retry_failed_website()
