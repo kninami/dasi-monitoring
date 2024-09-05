@@ -3,3 +3,4 @@
 *.log
 venv/
 .DS_Store
+old_website_checker.py

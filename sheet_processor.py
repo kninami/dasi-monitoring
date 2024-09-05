@@ -14,7 +14,8 @@ def connect_to_gsheet(json_keyfile_path, spreadsheet_id):
 
 # 시트에서 데이터 불러오기
 def get_data_from_sheet(sheet):
-    worksheet = sheet.sheet1  # 첫 번째 워크시트
-    data = worksheet.get_all_values()
+    print(sheet)
+    # worksheet = sheet.sheet3  # 세 번째 워크시트
+    #data = worksheet.get_all_values()
 
-    return data
+    #return data
