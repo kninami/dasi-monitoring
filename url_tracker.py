@@ -1,5 +1,6 @@
 import re 
 import os
+import sys
 import logging
 from urllib.parse import urlparse, urlunparse
 from dotenv import load_dotenv
@@ -65,7 +66,7 @@ def log_url_change(original_url, new_url):
         print(log_message)  # 콘솔에도 출력
 
 # 실패한 웹사이트들 숫자 올려보며 재실행
-def retry_failed_website():
+def retry_failed_website(sheet_number):
     global worksheet
     load_dotenv()
 
@@ -74,7 +75,7 @@ def retry_failed_website():
     spreadsheet_id = os.getenv("SHEET_ID")
 
     sheet = sheet_processor.connect_to_gsheet(json_keyfile_path, spreadsheet_id)
-    worksheet = sheet.get_worksheet(2)
+    worksheet = sheet.get_worksheet(sheet_number)
     filtered_rows = get_failed_result_row(worksheet)
     results = []
 
@@ -104,11 +105,18 @@ def retry_failed_website():
                 results.append((row_num, updated_row))
                 break
 
-    print(results)
-
     for row_num, updated_row in results:
         cell_range = f'A{row_num}:F{row_num}'  # 해당 row_num에 있는 A~F 열 범위 지정
         worksheet.update([updated_row], cell_range)
 
 if __name__ == "__main__":
-    retry_failed_website()
+    if len(sys.argv) < 2:
+        print("Error: 웹사이트를 검사할 Google Sheet가 몇 번째 시트인지 알려주세요.")
+        print("사용 예(첫 번째 Sheet인 경우): python url_tracker.py 1")
+        sys.exit(1) 
+    try:
+        sheet_number = int(sys.argv[1])-1
+        retry_failed_website(sheet_number)
+    except ValueError:
+        print("Error: Sheet 순서는 숫자로만 넣어주셔야 합니다")
+        sys.exit(1)

@@ -1,5 +1,6 @@
 import os
 import logging
+import sys
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.common.exceptions import WebDriverException, TimeoutException
@@ -71,7 +72,7 @@ def log_url_check(url, title, current_url):
     print(log_message)
 
 
-def main():
+def main(sheet_number):
     global worksheet
     load_dotenv()
 
@@ -80,7 +81,7 @@ def main():
     spreadsheet_id = os.getenv("SHEET_ID")
 
     sheet = sheet_processor.connect_to_gsheet(json_keyfile_path, spreadsheet_id)
-    worksheet = sheet.get_worksheet(2)
+    worksheet = sheet.get_worksheet(sheet_number)
     rows = worksheet.get_all_values()
     results = []
 
@@ -112,5 +113,15 @@ def main():
         results.append(updated_row)
     worksheet.update(results, f'A2:F{len(rows)}')
 
+
 if __name__ == "__main__":
-    main()
+    if len(sys.argv) < 2:
+        print("Error: 웹사이트를 검사할 Google Sheet가 몇 번째 시트인지 알려주세요.")
+        print("사용 예(첫 번째 Sheet인 경우): python website_checker.py 1")
+        sys.exit(1)  
+    try:
+        sheet_number = int(sys.argv[1])
+        main(sheet_number - 1)
+    except ValueError:
+        print("Error: Sheet 순서는 숫자로만 넣어주셔야 합니다")
+        sys.exit(1)
