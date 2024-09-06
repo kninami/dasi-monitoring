@@ -22,19 +22,25 @@ def check_website_with_selenium_headless(url):
     current_url = url
     result = ''
 
+    # 통신사에서 차단된 페이지
+    block_list = ['warning.or.kr', 'uplus.co.kr', 'skbroadband.com']
+
     # URL에 "http"가 포함되지 않으면 바로 리턴 (예: 접속불가)
     if "http" not in url:
         return redirect_flag, 'X', url
 
     try:
         driver = webdriver.Chrome(options=options)
+        driver.set_page_load_timeout(10)
         driver.get(url)
 
         title = driver.title
         current_url = driver.current_url
         driver.quit()
 
-        redirect_flag = url != current_url
+        # 리다이렉트된 URL이 공식 차단 페이지가 아니라면 
+        if not any(block in current_url for block in block_list):
+            redirect_flag = url != current_url
 
         if title:
             log_url_check(url, title, current_url)
@@ -63,6 +69,7 @@ def log_url_check(url, title, current_url):
     log_message = f"Redirect: {redirect_flag} | Original URL: {url} | Site Title: {title} | Current Url: {current_url} | Checked at: {datetime.now()}"
     logging.info(log_message)
     print(log_message)
+
 
 def main():
     global worksheet
