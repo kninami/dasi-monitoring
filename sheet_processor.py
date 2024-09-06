@@ -11,11 +11,3 @@ def connect_to_gsheet(json_keyfile_path, spreadsheet_id):
     spreadsheet = client.open_by_key(spreadsheet_id)
 
     return spreadsheet
-
-# 시트에서 데이터 불러오기
-def get_data_from_sheet(sheet):
-    print(sheet)
-    # worksheet = sheet.sheet3  # 세 번째 워크시트
-    #data = worksheet.get_all_values()
-
-    #return data

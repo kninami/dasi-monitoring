@@ -91,7 +91,6 @@ def retry_failed_website(sheet_number):
             trial_url = create_url_by_increasing_number(trial_url)
             print(f"Trying URL: {trial_url}")
             redirect_flag, result, redirect_url = website_checker.check_website_with_selenium_headless(trial_url)
-            print(result)
             if result == 'O':
                 final_url = redirect_url if redirect_flag else trial_url
                 updated_row = [
