@@ -11,7 +11,6 @@ json_keyfile_path = os.getenv("KEYFILE_PATH")
 spreadsheet_id = os.getenv("TWITTER_SHEET_ID")
 bearer_token = os.getenv("BEARER_TOKEN")
 
-# Replace with your actual Bearer Token from Twitter Developer portal
 def check_user_status(username):
     url = f"https://api.twitter.com/2/users/by/username/{username}"
     headers = {"Authorization": f"Bearer {bearer_token}"}
@@ -19,12 +18,9 @@ def check_user_status(username):
     response = requests.get(url, headers=headers)
     response_content = response.json()
 
-
-    # Get the rate limit headers
     remaining_requests = response.headers.get('x-rate-limit-remaining')
     reset_time = response.headers.get('x-rate-limit-reset')
 
-    # Print remaining requests and reset time
     print(f"Remaining requests: {remaining_requests}")
     print(f"Rate limit resets at: {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(int(reset_time)))}")
     print(response_content)
