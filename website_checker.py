@@ -1,4 +1,5 @@
 import os
+import re
 import logging
 import sys
 from selenium import webdriver
@@ -16,12 +17,18 @@ logging.basicConfig(
     filemode='a'
 )
 
-def check_website_with_selenium_headless(url):
+def check_website_with_selenium_headless(url, title):
     options = Options()
     options.add_argument("--headless")
     redirect_flag = False
     current_url = url
     result = ''
+
+    # 검사할 타이틀 키워드
+    # 괄호를 기준으로 분리하여 괄호 밖과 괄호 안의 내용 모두 추출 ex: 오피스타(레플리카2)
+    title_list = ['유흥', '성매매', '오피', '출장', '안마', '마사지', '키스', '잠시만']
+    titles = re.findall(r'\w+', title)
+    title_list.extend(titles)
 
     # 통신사에서 차단된 페이지
     block_list = ['warning.or.kr', 'uplus.co.kr', 'skbroadband.com']
@@ -35,7 +42,7 @@ def check_website_with_selenium_headless(url):
         driver.set_page_load_timeout(10)
         driver.get(url)
 
-        title = driver.title
+        site_title = driver.title
         current_url = driver.current_url
         driver.quit()
 
@@ -43,8 +50,9 @@ def check_website_with_selenium_headless(url):
         if not any(block in current_url for block in block_list):
             redirect_flag = url != current_url
 
-        if title:
-            log_url_check(url, title, current_url)
+        # 타이틀 키워드 가운데 하나라도 사이트에 포함되어 있다면
+        if any(word in site_title for word in title_list):  
+            log_url_check(url, site_title, current_url)
             result = 'O'
         else:
             result = 'X'
@@ -86,16 +94,15 @@ def main(sheet_number):
     results = []
 
     for i in range(1, len(rows)):
-        updated_row = []
         row = rows[i]
         url = row[4]
-        redirect_flag, result, redirect_url = check_website_with_selenium_headless(url)
-        
+        title = row[3]
+        redirect_flag, result, redirect_url = check_website_with_selenium_headless(url, title)       
         updated_row = [
             row[0],           # 1번째 열 (연번)
             result,           # 2번째 열 (활성화 여부-국내)
             row[2],           # 3번째 열 (활성화 여부-국외)
-            row[3],           # 4번째 열 (이름)
+            title,           # 4번째 열 (이름)
         ]
 
         if(redirect_flag):
