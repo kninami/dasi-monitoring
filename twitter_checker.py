@@ -19,6 +19,14 @@ def check_user_status(username):
     response = requests.get(url, headers=headers)
     response_content = response.json()
 
+
+    # Get the rate limit headers
+    remaining_requests = response.headers.get('x-rate-limit-remaining')
+    reset_time = response.headers.get('x-rate-limit-reset')
+
+    # Print remaining requests and reset time
+    print(f"Remaining requests: {remaining_requests}")
+    print(f"Rate limit resets at: {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(int(reset_time)))}")
     print(response_content)
 
     # "Too Many Requests" 처리
@@ -58,7 +66,7 @@ if __name__ == "__main__":
             else:
                 print("API limit reached")
                 break
-            
+
             time_delay = random.uniform(3, 10)
             print(f"Delaying for {time_delay:.2f} seconds...")
             time.sleep(time_delay)
