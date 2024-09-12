@@ -1,4 +1,5 @@
-import json
+import time
+import random
 import os
 import requests
 from dotenv import load_dotenv
@@ -42,7 +43,6 @@ if __name__ == "__main__":
     worksheet = sheet.get_worksheet(0)
     user_list = worksheet.get_all_values()
     
-    #체크해야 할 트위터 계정 3개만 가져옴
     need_to_check_user_rows = []
     for index, user in enumerate(user_list):
         user_account = user[2]
@@ -58,3 +58,10 @@ if __name__ == "__main__":
             else:
                 print("API limit reached")
                 break
+            
+            time_delay = random.uniform(3, 10)
+            print(f"Delaying for {time_delay:.2f} seconds...")
+            time.sleep(time_delay)
+
+        if len(need_to_check_user_rows) == 3:
+            break
