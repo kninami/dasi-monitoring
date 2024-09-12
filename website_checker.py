@@ -91,24 +91,17 @@ def main(sheet_number):
         url = row[4]
         redirect_flag, result, redirect_url = check_website_with_selenium_headless(url)
         
+        updated_row = [
+            row[0],           # 1번째 열 (연번)
+            result,           # 2번째 열 (활성화 여부-국내)
+            row[2],           # 3번째 열 (활성화 여부-국외)
+            row[3],           # 4번째 열 (이름)
+        ]
+
         if(redirect_flag):
-            updated_row = [
-                row[0],           # 1번째 열 (연번)
-                result,           # 2번째 열 (활성화 여부-국내)
-                row[2],           # 3번째 열 (활성화 여부-국외)
-                row[3],           # 4번째 열 (이름)
-                redirect_url,     # 5번째 열 (찾아낸 신규 URL)
-                url,              # 6번째 열 (이전의 URL)
-            ]
+            updated_row.extend([redirect_url, url])  # 5번째: 새 URL, 6번째: 이전 URL
         else:         
-            updated_row = [
-                row[0],           # 1번째 열 (연번)
-                result,           # 2번째 열 (활성화 여부-국내)
-                row[2],           # 3번째 열 (활성화 여부-국외)
-                row[3],           # 4번째 열 (이름)
-                url,              # 5번째 열 (원래 URL 유지)
-                row[5],           # 6번째 열 (이전의 URL)
-            ]
+            updated_row.extend([url, row[5]]) # 5번째: 원래 URL, 6번째: 이전 URL
 
         results.append(updated_row)
     worksheet.update(results, f'A2:F{len(rows)}')
