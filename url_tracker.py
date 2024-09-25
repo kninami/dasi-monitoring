@@ -53,7 +53,7 @@ def create_url_by_increasing_number(url):
     return trial_url
 
 def get_failed_result_row(worksheet):
-    rows = worksheet.get_all_values()
+    rows = worksheet.get_values('A:F')
     # 2번째 열 값이 'X'인 행과 그 행 번호를 함께 저장
     filtered_rows_with_index = [(i + 1, row) for i, row in enumerate(rows) if row[1] == 'X'] 
     return filtered_rows_with_index
