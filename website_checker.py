@@ -90,7 +90,10 @@ def main(sheet_number):
 
     sheet = sheet_processor.connect_to_gsheet(json_keyfile_path, spreadsheet_id)
     worksheet = sheet.get_worksheet(sheet_number)
-    rows = worksheet.get_all_values()
+
+    sheet_processor.insert_column_after_last_but_one(sheet, worksheet.id)
+
+    rows = worksheet.get_values('A:F')
     results = []
 
     for i in range(1, len(rows)):
