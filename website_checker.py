@@ -19,7 +19,11 @@ logging.basicConfig(
 
 def check_website_with_selenium_headless(url, title):
     options = Options()
-    options.add_argument("--headless")
+    options.add_argument("--headless")    
+    options.add_argument("--ignore-certificate-errors")  # SSL 인증서 오류 무시
+    options.add_argument("--allow-insecure-localhost")  # 로컬 SSL 오류 무시
+    options.add_argument("--disable-web-security")  # 웹 보안 비활성화
+    
     redirect_flag = False
     current_url = url
     result = ''
